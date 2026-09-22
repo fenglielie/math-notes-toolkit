@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="280" viewBox="0 0 480 280" role="img" aria-labelledby="title desc">
+  <title id="title">The graph of y = x squared</title>
+  <desc id="desc">A parabola with vertex at the origin, symmetric about the vertical axis.</desc>
+  <rect width="480" height="280" rx="6" fill="#f0f6f7"/>
+  <g fill="none" stroke="#63747a" stroke-width="1.5">
+    <path d="M40 240H440M240 255V25"/>
+    <path d="m432 236 8 4-8 4M236 33l4-8 4 8"/>
+  </g>
+  <path d="M65 45Q240 435 415 45" fill="none" stroke="#0b8298" stroke-width="3"/>
+  <g fill="#17272c" font-family="Georgia, serif" font-size="18">
+    <text x="442" y="259">x</text>
+    <text x="253" y="31">y</text>
+    <text x="224" y="260">0</text>
+    <text x="300" y="73">y = x²</text>
+  </g>
+</svg>

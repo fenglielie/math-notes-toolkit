@@ -1,0 +1,11 @@
+{
+  "name": "my-math-notes",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "math-notes-cli dev",
+    "build": "math-notes-cli build",
+    "build:latex": "math-notes-cli build:latex",
+    "sync:framework": "math-notes-cli update"
+  }
+}

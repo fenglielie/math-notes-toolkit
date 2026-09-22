@@ -1,0 +1,5 @@
+:is(.prose, .markdown-body) .text-highlight { background:#ffff00; color:#17272c; padding:0 .06em; box-decoration-break:clone; -webkit-box-decoration-break:clone; }
+:is(.prose, .markdown-body) .highlight-green { background:#98fb98; }
+:is(.prose, .markdown-body) .highlight-pink { background:#ffb6c1; }
+:is(.prose, .markdown-body) .text-highlight a { color:inherit; text-decoration:underline; }
+:is(.prose, .markdown-body) .text-highlight code { color:inherit; background:transparent; }

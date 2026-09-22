@@ -1,0 +1,54 @@
+{
+  "name": "markdown-math-preview",
+  "displayName": "Markdown Math Preview",
+  "description": "Math and style enhancements for VS Code Markdown preview, with offline MathJax, theorem blocks, and BibTeX citations.",
+  "version": "0.1.0",
+  "publisher": "markdown-math-local",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./dist/extension.cjs",
+  "activationEvents": [
+    "onLanguage:markdown"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "Markdown Math Preview",
+      "properties": {
+        "markdownMathPreview.enabled": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "description": "Enable extended Markdown rendering in this workspace. Disable other Markdown math renderers to avoid conflicts."
+        }
+      }
+    },
+    "markdown.markdownItPlugins": true,
+    "markdown.previewStyles": [
+      "./media/highlights.css",
+      "./media/preview.css"
+    ],
+    "markdown.previewScripts": [
+      "./media/preview.js"
+    ],
+    "commands": [
+      {
+        "command": "markdownMathPreview.open",
+        "title": "Markdown Math Preview: Open Preview to the Side"
+      }
+    ]
+  },
+  "keywords": [
+    "markdown",
+    "mathjax",
+    "latex",
+    "bibtex",
+    "theorem"
+  ],
+  "icon": "media/icon.png"
+}

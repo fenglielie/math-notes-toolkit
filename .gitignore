@@ -1,0 +1,15 @@
+node_modules/
+public/
+.cache/
+.build-*/
+test-results/
+.aux/
+*.synctex.gz
+*.tgz
+*.vsix
+extension/dist/
+extension/media/vendor/
+extension/media/preview.js
+extension/media/highlights.css
+extension/SYNTAX.md
+extension/examples/

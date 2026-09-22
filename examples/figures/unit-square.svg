@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#fbfcfc"/>
+  <rect x="40" y="30" width="160" height="160" fill="#e8f5f7" stroke="#0b8298" stroke-width="3"/>
+  <g font-family="sans-serif" font-size="18" fill="#17272c" text-anchor="middle">
+    <text x="120" y="218">1</text>
+    <text x="20" y="116">1</text>
+    <text x="120" y="116">Area = 1</text>
+  </g>
+</svg>

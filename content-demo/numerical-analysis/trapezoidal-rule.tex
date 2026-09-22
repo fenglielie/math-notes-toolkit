@@ -1,0 +1,128 @@
+% !TEX program = pdflatex
+\documentclass[10pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=22mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,xcolor}
+\usepackage{fancyhdr}
+\usepackage[colorlinks=true,linkcolor=teal,urlcolor=teal]{hyperref}
+\definecolor{teal}{HTML}{0B8298}
+\definecolor{muted}{HTML}{63747A}
+\hypersetup{pdftitle={Numerical integration: the trapezoidal rule},pdfauthor={Your Name}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{muted}Math Notes}
+\fancyhead[R]{\small\color{muted}Numerical analysis}
+\fancyfoot[L]{\small\href{https://example.com}{example.com}}
+\fancyfoot[R]{\small\thepage}
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\newtheorem{theorem}{Theorem}
+\begin{document}
+{\small\color{teal}NUMERICAL ANALYSIS}\par
+{\LARGE\bfseries Numerical integration: the trapezoidal rule}\par
+{\small\color{muted}A short mathematical note}\par
+\vspace{6pt}
+
+\section{From a line segment to a quadrature rule}
+Suppose we want to approximate
+\[
+I(f)=\int_a^b f(x)\,\mathrm{d}x.
+\]
+Replace the graph of \(f\) by the straight line joining its endpoint values. Integrating this linear interpolant gives the trapezoidal approximation
+\begin{equation}
+T_1(f)=\frac{b-a}{2}\bigl(f(a)+f(b)\bigr).
+\label{eq:single}
+\end{equation}
+The rule is exact for affine functions. A curved graph introduces an error that can be controlled by the second derivative.
+
+\section{The composite rule}
+Divide the interval into \(n\) equal subintervals, with
+\[
+h=\frac{b-a}{n},\qquad x_j=a+jh,\qquad j=0,\ldots,n.
+\]
+Apply \eqref{eq:single} on each subinterval and add the contributions:
+\begin{align}
+T_n(f)
+&=\sum_{j=0}^{n-1}\frac{h}{2}
+  \bigl(f(x_j)+f(x_{j+1})\bigr) \notag\\
+&=h\left[\frac{f(a)}2+\sum_{j=1}^{n-1}f(x_j)+\frac{f(b)}2\right].
+\label{eq:composite}
+\end{align}
+Interior values occur twice, so their weights become \(h\). Each endpoint occurs only once and receives weight \(h/2\).
+
+\section{An error estimate}
+\begin{theorem}
+If \(f\in C^2([a,b])\), there is a point \(\xi\in(a,b)\) such that
+\begin{equation}
+I(f)-T_n(f)=-\frac{(b-a)h^2}{12}f''(\xi).
+\label{eq:error}
+\end{equation}
+Consequently,
+\[
+|I(f)-T_n(f)|\le
+\frac{(b-a)h^2}{12}\max_{x\in[a,b]}|f''(x)|.
+\]
+\end{theorem}
+\begin{proof}
+On \([x_j,x_{j+1}]\), the linear interpolation remainder is
+\[
+f(x)-p_j(x)=\frac{f''(\eta_x)}{2}(x-x_j)(x-x_{j+1}).
+\]
+The product has one sign on this interval. The weighted mean-value theorem for integrals therefore gives a local error
+\(-h^3f''(\xi_j)/12\). Summing over all intervals and using continuity of \(f''\) yields \eqref{eq:error}.
+\end{proof}
+
+\newpage
+\section{A worked example}
+Take \(f(x)=x^2\) on \([0,1]\). The exact integral is \(I(f)=1/3\). Since \(f''=2\), the error formula gives
+\begin{equation}
+T_n(f)=\frac13+\frac{1}{6n^2}.
+\label{eq:example}
+\end{equation}
+The approximation is too large, as expected for a convex graph: each chord lies above the curve.
+
+\begin{center}
+\begin{tabular}{rrr}
+\toprule
+\(n\) & \(T_n(f)\) & \(T_n(f)-I(f)\)\\
+\midrule
+1  & 0.50000000 & 0.16666667\\
+2  & 0.37500000 & 0.04166667\\
+4  & 0.34375000 & 0.01041667\\
+8  & 0.33593750 & 0.00260417\\
+16 & 0.33398438 & 0.00065104\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Doubling the number of subintervals divides the error by four. This is the characteristic behavior of a method with second-order accuracy.
+
+\section{Richardson extrapolation}
+For a sufficiently smooth integrand, suppose the leading error has the expansion
+\[
+T_n(f)=I(f)+Ch^2+O(h^4).
+\]
+Refining the mesh gives
+\[
+T_{2n}(f)=I(f)+\frac{C}{4}h^2+O(h^4).
+\]
+The combination
+\begin{equation}
+R_n(f)=\frac{4T_{2n}(f)-T_n(f)}{3}
+=I(f)+O(h^4)
+\label{eq:richardson}
+\end{equation}
+eliminates the leading error term. For the quadratic example, inserting \eqref{eq:example} into \eqref{eq:richardson} gives \(R_n(f)=1/3\) exactly.
+
+\section{Practical reading of the estimate}
+\begin{itemize}
+\item The regularity assumption matters. A nonsmooth integrand may not exhibit the predicted convergence rate.
+\item A small difference between two approximations is evidence of convergence, not by itself a rigorous error bound.
+\item Formula \eqref{eq:error} describes discretization error. Floating-point roundoff is a separate source of error.
+\end{itemize}
+
+\vfill
+{\small\color{muted}This sample PDF contains selectable text, aligned equations, theorem and proof environments, and a table. It is included with the Math Notes static blog framework.}
+\end{document}

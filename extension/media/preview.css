@@ -1,0 +1,45 @@
+.markdown-body {
+  --mn-theorem: #75429a;
+  --mn-lemma: #2b6397;
+  --mn-definition: #287246;
+  --mn-remark: #986426;
+  --mn-problem: #b34870;
+  --mn-proof: #63747a;
+  --mn-tint: 8%;
+}
+.vscode-dark .markdown-body, .vscode-high-contrast .markdown-body {
+  --mn-theorem: #c6a0e4;
+  --mn-lemma: #93bfe8;
+  --mn-definition: #90caa4;
+  --mn-remark: #dfb578;
+  --mn-problem: #e4a0bc;
+  --mn-proof: #a8b8c3;
+  --mn-tint: 18%;
+}
+.markdown-body .statement {
+  --mn-accent: var(--mn-theorem);
+  border: 2px solid var(--mn-accent);
+  background: color-mix(in srgb, var(--mn-accent) var(--mn-tint), transparent);
+  padding: 1px 16px 3px;
+  margin: 16px 0;
+}
+.markdown-body .statement > p { margin: 8px 0; }
+.markdown-body .statement .statement-title { font-weight: 600; color: var(--mn-accent); margin: 9px 0 5px; }
+.markdown-body .statement:is(.lemma,.corollary) { --mn-accent: var(--mn-lemma); }
+.markdown-body .statement.definition { --mn-accent: var(--mn-definition); }
+.markdown-body .statement:is(.example,.remark,.note) { --mn-accent: var(--mn-remark); }
+.markdown-body .statement.problem { --mn-accent: var(--mn-problem); }
+.markdown-body .statement:is(.proof,.solution) { --mn-accent: var(--mn-proof); }
+.markdown-body .statement:is(.proof,.solution,.remark,.note) {
+  border: 0;
+  border-left: 3px solid var(--mn-accent);
+  background: none;
+  padding: 8px 20px;
+}
+.markdown-body .statement:is(.proof,.solution)::after { content: "□"; display: block; text-align: right; }
+.markdown-body .markdown-math-display { overflow-x: auto; overflow-y: hidden; padding: 8px 0; }
+.markdown-body .markdown-math-tex mjx-container { max-width: none; }
+.markdown-body .markdown-math-error { color: var(--vscode-errorForeground, #c43f39); white-space: pre-wrap; }
+.markdown-body .reference-links a { margin-left: .5em; }
+.markdown-body .reference-backlinks { font-size: .85em; }
+.markdown-body .citation { font-size: .9em; }

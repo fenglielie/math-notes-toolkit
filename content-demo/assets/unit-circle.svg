@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400" role="img" aria-labelledby="title desc">
+  <title id="title">Unit circle</title>
+  <desc id="desc">A unit circle and a radius to a point at angle theta. Its coordinates are cosine theta and sine theta.</desc>
+  <rect width="400" height="400" rx="6" fill="#f0f6f7"/>
+  <g fill="none" stroke="#63747a" stroke-width="1.5">
+    <path d="M25 210H375M190 375V25"/>
+    <path d="m367 206 8 4-8 4M186 33l4-8 4 8"/>
+    <path d="M190 65V355M45 210H335" stroke="#dfeaec"/>
+  </g>
+  <circle cx="190" cy="210" r="145" fill="none" stroke="#0b8298" stroke-width="2"/>
+  <path d="M190 210 292.53 107.47" stroke="#0b8298" stroke-width="2"/>
+  <path d="M292.53 107.47V210" fill="none" stroke="#63747a" stroke-dasharray="5 4"/>
+  <path d="M225 210A35 35 0 0 0 214.75 185.25" fill="none" stroke="#0b8298" stroke-width="1.5"/>
+  <circle cx="292.53" cy="107.47" r="4" fill="#0b8298"/>
+  <g fill="#17272c" font-family="Georgia, serif" font-size="16">
+    <text x="365" y="232">x</text><text x="204" y="34">y</text>
+    <text x="173" y="230">0</text><text x="334" y="231">1</text>
+    <text x="232" y="196">θ</text>
+    <text x="258" y="88">(cos θ, sin θ)</text>
+  </g>
+</svg>
