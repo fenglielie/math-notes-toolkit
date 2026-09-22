@@ -31,15 +31,18 @@ export async function renderMarkdown(source, { resolveLink = x => x } = {}) {
   const references = citations();
   md.use(references.plugin);
   md.use(statements, { kinds: statementKinds, renderOpen: renderStatementOpen });
-  const toc = [], ids = new Map();
+  const toc = [], ids = new Map(), usedIds = new Set();
   md.core.ruler.push('headings-and-links', state => {
     for (let i = 0; i < state.tokens.length; i++) {
       const t = state.tokens[i];
       if (t.type === 'heading_open') {
         const title = state.tokens[i + 1].content;
         const key = title.toLowerCase().replace(/[^\p{L}\p{N}_-]+/gu, '-').replace(/^-|-$/g, '') || 'section';
-        const n = (ids.get(key) || 0) + 1; ids.set(key, n);
-        const id = key + (n > 1 ? '-' + n : '');
+        let n = (ids.get(key) || 0) + 1;
+        let id = key + (n > 1 ? '-' + n : '');
+        while (usedIds.has(id)) id = key + '-' + (++n);
+        ids.set(key, n);
+        usedIds.add(id);
         t.attrSet('id', id);
         toc.push({ level: Number(t.tag.slice(1)), title, id });
       }
@@ -66,7 +69,13 @@ export async function renderMarkdown(source, { resolveLink = x => x } = {}) {
     }
   });
   const svg = new SVG({ fontCache: 'local', fontData: MathJaxNewcmFont });
-  const document = mathjax.document(rendered, { InputJax: tex, OutputJax: svg });
+  const document = mathjax.document(rendered, {
+    InputJax: tex,
+    OutputJax: svg,
+    // Only parsed math tokens opt in; Markdown escapes can leave literal delimiters elsewhere.
+    ignoreHtmlClass: '.*',
+    processHtmlClass: 'math-inline|math-scroll'
+  });
   await document.renderPromise();
   if (errors.length) throw new Error('LaTeX: ' + errors.join('; '));
   // Source annotations provide a readable fallback and let readers inspect/copy TeX.

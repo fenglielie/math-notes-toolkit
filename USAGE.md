@@ -6,6 +6,10 @@ Run the CLI from your site directory. `math-notes-cli dev` watches source files 
 
 Only content, configuration, and personal resources belong in a site repository. Framework scripts, default assets, tests, and generic examples belong in this package. Installed code must not be edited directly.
 
+## Rendering guarantees
+
+Escaped math delimiters remain literal text. Statement markers inside fenced or indented code remain literal, including fences introduced by list markers. Heading IDs and table-of-contents targets are unique within each article, including when a title already contains a numeric suffix. See `SYNTAX.md` and `content-demo/writing-guide.md` for authoring examples.
+
 ## Configuration
 
 Create `site.config.mjs`:

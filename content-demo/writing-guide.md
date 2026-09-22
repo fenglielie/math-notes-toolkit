@@ -105,6 +105,8 @@ Write a literal price as \$5; put LaTeX source in code, such as `\frac{a}{b}`.
 
 Write a literal price as \$5; put LaTeX source in code, such as `\frac{a}{b}`.
 
+Literal escaped delimiters remain text: \\(x\\) and \\[x\\]. Write them as `\\(x\\)` and `\\[x\\]` in the source.
+
 ### Highlighter annotations
 
 Use `{% color yellow begin %}text{% color end %}` for yellow; replace `yellow` with `green` or `pink` for other colors. Highlights wrap with the text, like a PDF highlighter, and keep dark text on a bright background in either theme. Keep each pair within one paragraph; markers can be inline or on their own lines without blank lines. Code stays literal. Escape the opening brace to display a marker as ordinary text. Unmatched markers and unsupported colors report build errors.
@@ -861,6 +863,28 @@ A note adds reading advice or background without a filled box. The label remains
 
 The supported names are definition, lemma, proposition, corollary, theorem, example, problem, proof, solution, remark, and note. Blocks may be nested, as in the proof and problem above. Always close them in reverse order; do not use colon-style block markers.
 
+### Statement markers inside list code blocks
+
+A fence may start on the same line as a list marker. Statement markers inside the fence stay literal, including a marker that matches the surrounding block:
+
+````markdown
+{% theorem begin Code example %}
+- ```markdown
+  {% theorem end %}
+  ```
+
+This paragraph is still inside the theorem.
+{% theorem end %}
+````
+
+{% theorem begin Code example %}
+- ```markdown
+  {% theorem end %}
+  ```
+
+This paragraph is still inside the theorem.
+{% theorem end %}
+
 ## Local figures
 
 ### Markdown image
@@ -901,7 +925,7 @@ Images are centered and shrink proportionally on narrow screens. HTML images acc
 - [Open the sample PDF](numerical-analysis/trapezoidal-rule.pdf)
 - [Homepage](https://example.com)
 
-The build rewrites links to Markdown notes and copies referenced attachments. Missing files or links to unpublished notes cause a build error. Anchor links use the heading text in lowercase, with spaces replaced by hyphens.
+The build rewrites links to Markdown notes and copies referenced attachments. Missing files or links to unpublished notes cause a build error. Anchor links use the heading text in lowercase, with spaces replaced by hyphens. Duplicate IDs receive an unused numeric suffix: headings Foo, Foo, and Foo-2 produce foo, foo-2, and foo-2-2.
 
 ## PDF notes
 

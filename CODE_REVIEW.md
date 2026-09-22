@@ -6,7 +6,7 @@ Date: 2026-09-22
 
 Reviewed the shared Markdown renderer, VS Code adapter, browser preview, package configuration, and existing tests. Three reproducible functional defects were found. All are priority P2 (medium): they affect specific supported inputs and should be addressed in a normal maintenance cycle.
 
-This report records findings only. No source fixes were made. This was a targeted review, not an exhaustive security audit.
+The initial review recorded findings only and made no source changes. All three findings are now fixed; see Resolution below for changes and validation. This was a targeted review, not an exhaustive security audit.
 
 ## 1. Escaped text is reinterpreted as mathematics by the Node renderer
 
@@ -101,3 +101,20 @@ Actual: both the rendered HTML and returned table of contents contain the IDs `f
 - The independent integration tests inside a real VS Code instance were not run.
 - The successful existing suite does not cover the failing inputs documented above. No regression tests or fixes were added during this review.
 - Build and browser checks generated ignored resources and screenshots; application source files were not changed.
+
+## Resolution
+
+All three findings above have been fixed in Math Notes Toolkit. The original findings and review-time validation remain above as a record of the inputs that failed.
+
+1. The Node adapter now opts only parsed math token containers into MathJax processing. Escaped delimiters remain literal, including text containing unknown TeX commands; real formulas still share macros, numbering, and forward references, and invalid real formulas still fail.
+2. Statement markers now participate directly in Markdown block parsing. A post-parse pass validates matching boundaries and source ranges, so native fence, list, blockquote, and indentation handling determines which markers are active. Statements cannot cross Markdown container boundaries.
+3. Heading generation tracks all emitted IDs and skips occupied suffixes. Rendered headings and table-of-contents entries use the same unique IDs.
+
+Regression coverage is in [test/core/review-regressions.test.mjs](test/core/review-regressions.test.mjs): 13 additional tests cover both renderer adapters, list-opening fences with and without blank lines, ordered/nested/quoted lists, fence lengths and characters, indented code, source maps, error locations, and heading collisions.
+
+Validation after the fixes:
+
+- `npm run check`: demo and extension builds, all 81 Node tests, and extension browser checks passed.
+- Website browser checks passed against the demo server, including desktop/mobile, light/dark, navigation, math, search, PDFs, and encrypted articles.
+- The consumer site was updated to the new local package and built successfully: 63 notes. All 150 source/attachment files and 81 normalized generated pages/indexes matched the migration baseline.
+- Real VS Code extension-host integration tests were not rerun; the adapter tests and browser preview checks passed.

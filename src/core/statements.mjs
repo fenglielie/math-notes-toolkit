@@ -1,54 +1,47 @@
-// Explicit begin/end blocks preserve Markdown parsing and leave code samples untouched.
+// Let the Markdown block parser handle code fences and container indentation.
 export function statements(md, { kinds, renderOpen }) {
-  const parse = line => {
-    const match = line.match(/^\{%\s*(\w+)\s+(begin|end)(?:\s+(.+?))?\s*%\}\s*$/);
-    if (!match) return null;
-    const kind = match[1];
-    if (!kinds.includes(kind)) return null;
-    return { kind, action: match[2], title: (match[3] || '').trim() };
-  };
   md.block.ruler.before('fence', 'statement', (state, start, end, silent) => {
     if (state.sCount[start] - state.blkIndent >= 4) return false;
-    const lineText = line => state.src.slice(state.bMarks[line] + state.tShift[line], state.eMarks[line]);
-    const opening = parse(lineText(start));
-    if (!opening) return false;
+    const line = state.src.slice(state.bMarks[start] + state.tShift[start], state.eMarks[start]);
+    const match = line.match(/^\{%\s*(\w+)\s+(begin|end)(?:\s+(.+?))?\s*%\}\s*$/);
+    if (!match || !kinds.includes(match[1])) return false;
     if (silent) return true;
-    if (opening.action !== 'begin') throw new Error('Unexpected ' + opening.kind + ' end marker at line ' + (start + 1));
-    const stack = [opening.kind];
-    let closing = start, fence = null;
-    while (++closing < end) {
-      if (state.sCount[closing] - state.blkIndent >= 4) continue;
-      const text = lineText(closing);
-      if (fence) {
-        const marker = text.match(/^(\x60+|~+)\s*$/)?.[1];
-        if (marker?.[0] === fence[0] && marker.length >= fence.length) fence = null;
-        continue;
-      }
-      const marker = text.match(/^(\x60{3,}|~{3,})/)?.[1];
-      if (marker) { fence = marker; continue; }
-      const directive = parse(text);
-      if (!directive) continue;
-      if (directive.action === 'begin') stack.push(directive.kind);
-      else {
-        if (directive.kind !== stack.pop()) throw new Error('Mismatched statement end marker at line ' + (closing + 1));
-        if (!stack.length) break;
-      }
-    }
-    if (closing === end) throw new Error('Unclosed ' + opening.kind + ' block at line ' + (start + 1));
-    const token = state.push('statement_open', 'section', 1);
+    const opening = match[2] === 'begin';
+    const token = state.push(opening ? 'statement_open' : 'statement_close', 'section', opening ? 1 : -1);
     token.block = true;
-    token.meta = opening;
-    token.map = [start, closing + 1];
-    const oldMax = state.lineMax, oldParent = state.parentType;
-    state.lineMax = closing;
-    state.parentType = 'container';
-    state.md.block.tokenize(state, start + 1, closing);
-    state.lineMax = oldMax;
-    state.parentType = oldParent;
-    state.push('statement_close', 'section', -1).block = true;
-    state.line = closing + 1;
+    token.meta = { kind: match[1], title: (match[3] || '').trim() };
+    token.map = [start, start + 1];
+    state.line = start + 1;
     return true;
   }, { alt: ['paragraph', 'reference', 'blockquote', 'list'] });
+
+  // Validate actual parsed blocks, so marker text inside code cannot close a statement.
+  md.core.ruler.after('block', 'statement_boundaries', state => {
+    const stack = [];
+    const unclosed = token => {
+      throw new Error('Unclosed ' + token.meta.kind + ' block at line ' + (token.map[0] + 1));
+    };
+    for (const token of state.tokens) {
+      if (token.nesting === 1) stack.push(token);
+      if (token.nesting !== -1) continue;
+      const opening = stack.at(-1);
+      if (token.type === 'statement_close') {
+        if (!stack.some(item => item.type === 'statement_open')) {
+          throw new Error('Unexpected ' + token.meta.kind + ' end marker at line ' + (token.map[0] + 1));
+        }
+        if (opening?.type !== 'statement_open' || opening.meta.kind !== token.meta.kind) {
+          throw new Error('Mismatched statement end marker at line ' + (token.map[0] + 1));
+        }
+        opening.map[1] = token.map[1];
+      } else if (opening?.type === 'statement_open') {
+        // A statement opened in a list item or blockquote must also close there.
+        unclosed(opening);
+      }
+      stack.pop();
+    }
+    const opening = stack.find(token => token.type === 'statement_open');
+    if (opening) unclosed(opening);
+  });
   md.renderer.rules.statement_open = (tokens, i) => renderOpen(tokens[i].meta.kind, tokens[i].meta.title);
   md.renderer.rules.statement_close = () => '</section>\n';
 }

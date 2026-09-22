@@ -12,6 +12,8 @@ Euler's identity $e^{i\pi}+1=0$, or \(a^2+b^2=c^2\).
 
 Both `$...$` and `\(...\)` are supported. Inline math must stay on one source line. Do not put whitespace immediately inside dollar delimiters. Use display math for multiline formulas.
 
+Escape each delimiter backslash to show literal text: `\\(x\\)` displays `\(x\)`, and `\\[x\\]` displays `\[x\]`. Such text is not sent to the math renderer. Code spans and code blocks also preserve TeX literally.
+
 ### Display math
 
 ```markdown
@@ -90,6 +92,8 @@ Use **Markdown**, lists, blockquotes, and formulas here.
 | `note` | Note | Thin left rule, no background |
 
 Replace `theorem` in the example with any kind in the table. Names are lowercase, opening and closing kinds must match, and blocks may be nested. Labels are always English; titles and body text may use other languages. HTML and Markdown in titles are not rendered as rich text.
+
+Fenced code inside lists and blockquotes keeps statement markers literal, even when a fence starts on a list-item opening line. A statement opened inside a list item or blockquote must close inside that same container.
 
 Unclosed blocks or unmatched closing markers produce errors with source line numbers when available. Colon-fenced statement syntax is not supported.
 
