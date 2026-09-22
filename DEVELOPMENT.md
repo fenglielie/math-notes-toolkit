@@ -25,7 +25,7 @@ npm run dev:demo
 
 Edit shared syntax in `src/core/`, `SYNTAX.md`, and `examples/`; edit VS Code integration in `extension/src/`. Both hosts import the shared renderer source directly.
 
-The extension manifest describes a VS Code product, not another installed npm package. Dependencies and the lockfile live only at the root. Build commands synchronize its version from the root manifest and generate its syntax docs, examples, highlight CSS, and offline resources. No internal tarballs, Git dependencies, or bundleDependencies connect the components.
+The extension manifest describes a VS Code product, not another installed npm package. Dependencies and the lockfile live only at the root. Build commands synchronize its version from the root manifest and generate its examples, highlight CSS, and offline resources. The extension links to the root syntax reference instead of bundling a duplicate. No internal tarballs, Git dependencies, or bundleDependencies connect the components.
 
 ## 🧪 Build and test
 
@@ -47,7 +47,7 @@ The extension manifest describes a VS Code product, not another installed npm pa
 
 Browser tests use installed Edge on Windows; elsewhere install a Playwright browser or set BROWSER_CHANNEL. F5 launches the extension development window from the root workspace. The separate integration-test launch configuration runs inside VS Code and is not part of npm run check.
 
-Generated output under public/, .cache/, extension/dist/, and extension/media/vendor/ must not be edited. The root .gitignore also identifies generated extension scripts, styles, examples, docs, and package archives.
+Generated output under public/, .cache/, extension/dist/, and extension/media/vendor/ must not be edited. The root .gitignore also identifies generated extension scripts, styles, examples, and package archives.
 
 ## 🔄 Update a local site
 

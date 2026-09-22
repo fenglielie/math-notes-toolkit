@@ -21,7 +21,7 @@ await build({
   bundle: true, platform: 'browser', format: 'iife', target: 'es2022',
   legalComments: 'linked'
 });
-await fs.copyFile(path.join(project, 'SYNTAX.md'), path.join(directory, 'SYNTAX.md'));
+await fs.rm(path.join(directory, 'SYNTAX.md'), { force: true });
 await fs.cp(path.join(project, 'examples'), path.join(directory, 'examples'), { recursive: true });
 const manifest = JSON.parse(await fs.readFile(path.join(project, 'package.json'), 'utf8'));
 const extensionFile = path.join(directory, 'package.json');

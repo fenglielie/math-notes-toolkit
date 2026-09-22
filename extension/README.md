@@ -16,7 +16,7 @@ Run **Extensions: Install from VSIX...**, select the `.vsix` file downloaded fro
 
 The last two settings disable competing math rendering in VS Code and Markdown All in One. Open a Markdown document and press **Ctrl+K V**, or run **Markdown Math Preview: Open Preview to the Side**.
 
-See [SYNTAX.md](SYNTAX.md) for supported syntax and [examples/syntax-guide.md](examples/syntax-guide.md) for a complete example. These files are included in the VSIX and generated from the toolkit's canonical sources during development.
+See the shared [syntax reference](https://github.com/fenglielie/math-notes-toolkit/blob/main/SYNTAX.md) for supported syntax and [examples/syntax-guide.md](examples/syntax-guide.md) for a complete example. The example is copied from the toolkit's canonical source and included in the VSIX; the syntax reference is maintained only at the repository root.
 
 ## 📋 Behavior and limitations
 
