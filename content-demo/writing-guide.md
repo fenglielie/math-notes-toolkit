@@ -8,9 +8,9 @@ slug: e1fe469bcfff
 
 This page pairs copyable source with rendered examples. 本页可以直接作为数学笔记模板：复制需要的段落，然后替换内容即可。
 
-This demo lives in content-demo/. Run npm run dev:demo in the framework repository to preview it with site.demo.config.mjs. Installed sites use their own site.config.mjs and content directories. Framework instructions are in USAGE.md.
+This demo lives in content-demo/. Run npm run dev:demo in the framework repository to preview it with site.demo.config.mjs. Installed sites use their own site.config.mjs and content directories. Framework instructions are in README.md.
 
-For editor-side authoring, Markdown Math Preview adds custom syntax and offline MathJax to VS Code's built-in preview. The website framework and extension share the renderer in this repository. Its SYNTAX.md defines their common syntax. Use Ctrl+K V for native scroll synchronization and double-click source navigation. Multiline formulas map to source blocks. Use npm run dev:demo to inspect website layout, PDF embedding, and encrypted articles. See USAGE.md for setup.
+For editor-side authoring, Markdown Math Preview adds custom syntax and offline MathJax to VS Code's built-in preview. The website framework and extension share the renderer in this repository. Its SYNTAX.md defines their common syntax. Use Ctrl+K V for native scroll synchronization and double-click source navigation. Multiline formulas map to source blocks. Use npm run dev:demo to inspect website layout, PDF embedding, and encrypted articles. See README.md for setup.
 
 ## Metadata and organization
 
@@ -87,7 +87,7 @@ Try the [encrypted example](linear-algebra/spectral-theorem.md) with the passwor
 
 Titles, dates, tags, and URLs stay public, with an Encrypted badge. The body, contents, formulas, and relative local images and attachments are encrypted together. PDF wrappers also encrypt their PDFs. Search excludes the protected body and PDF text. Unlocking restores reading, copying, and navigation; refreshing locks the page again. Both dev and production require the password, HTTPS or localhost, and JavaScript.
 
-Keep plaintext source files and original attachments out of public repositories. Shared public/private attachments cause a build error; external URLs and manually published resources remain public. See USAGE.md for password setup and the encryption boundaries.
+Keep plaintext source files and original attachments out of public repositories. Shared public/private attachments cause a build error; external URLs and manually published resources remain public. See README.md for password setup and the encryption boundaries.
 
 ### Text and inline notation
 

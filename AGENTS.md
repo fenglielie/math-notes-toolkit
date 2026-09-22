@@ -10,4 +10,5 @@
 - npm run check builds the demo and extension, runs Node tests, and checks the browser extension. Run npm run test:browser against the demo server for website changes.
 - npm run test:package checks an independently installed package. npm run package:extension produces the VSIX.
 - The root version is authoritative; build:extension copies it into the extension manifest. Commit both manifests when changing versions.
-- Do not publish or choose a license without authorization. Preserve the existing CODE_REVIEW.md report; migrating structure does not resolve its findings.
+- Do not publish or choose a license without authorization.
+- Keep user installation and usage in README.md, and toolkit development, testing, packaging, and release instructions in DEVELOPMENT.md. Avoid overlapping guides. Keep SYNTAX.md as the shared syntax reference and extension/README.md for VSIX users. Use restrained emoji in user-facing documentation headings and navigation. Use explained version placeholders in release examples instead of hardcoding the current release version.
