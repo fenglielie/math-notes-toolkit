@@ -101,7 +101,7 @@ test('default builds require existing PDFs for wrappers, links and encrypted att
       assert.equal(Buffer.from(payload.attachments[0].data, 'base64').toString(), samplePdf());
     }
     await fs.unlink(path.join(root, 'content/lecture.pdf'));
-    await assert.rejects(build({ root }), /PDF not found:.*lecture\.pdf.*npm run build:latex.*commit/);
+    await assert.rejects(build({ root }), /PDF not found:.*lecture\.pdf.*npm run build:latex locally or in CI/);
     assert.deepEqual(await fs.readFile(path.join(root, 'public/index.html')), published);
   }
 });

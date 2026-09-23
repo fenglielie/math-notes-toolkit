@@ -197,7 +197,7 @@ export async function generate({ root = process.cwd(), configFile = 'site.config
         try { await fs.access(pdf); }
         catch (error) {
           if (error.code !== 'ENOENT') throw error;
-          throw new Error('PDF not found: ' + pdf + '. Run npm run build:latex locally using the same site configuration, then commit the generated PDF before deploying.', { cause: error });
+          throw new Error('PDF not found: ' + pdf + '. Run npm run build:latex locally or in CI using the same site configuration, then deploy public/. Ordinary builds require existing PDFs.', { cause: error });
         }
       }
       preparedPdfs.add(pdf);

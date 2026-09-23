@@ -138,7 +138,7 @@ pdf: lecture.pdf
 
 The PDF path is relative to the wrapper. Ordinary builds require an existing PDF and never invoke LaTeX. `build:latex` compiles PDFs with same-name `.tex` sources through `latexmk`; development previews also compile them and reuse successful outputs only while recorded dependencies remain unchanged. Compilation failures fail the build even if an older PDF exists.
 
-Commit source files and generated PDFs beside one another. Put auxiliary files under a sibling `.aux/` directory. Select an engine with a first-line `% !TEX program = pdflatex`, `xelatex`, or `lualatex` directive; otherwise the framework defaults to XeLaTeX. Use XeLaTeX for Chinese or mixed CJK documents.
+Keep generated PDFs beside their sources and auxiliary files under a sibling `.aux/` directory. Generated PDFs do not need to be tracked by Git when CI runs `build:latex` before deployment; ignore only generated PDFs, keeping PDF-only attachments available to the build. If the deployment environment only runs an ordinary build, supply prebuilt PDFs by committing them or downloading them before building. Select an engine with a first-line `% !TEX program = pdflatex`, `xelatex`, or `lualatex` directive; otherwise the framework defaults to XeLaTeX. Use XeLaTeX for Chinese or mixed CJK documents.
 
 The search interface can optionally include extracted PDF text; this option is off by default. PDF text does not contribute to the Markdown word count. PDF-only attachments do not require a TeX installation.
 
@@ -151,6 +151,8 @@ The password remains in the private source repository and is not copied into gen
 ### Deployment and upgrades
 
 Deploy only `public/`. Default builds require Node.js and existing PDFs but no LaTeX tools. Build output is replaced only after generation succeeds; temporary file locks are retried and a failed replacement restores the previous output.
+
+For source-only repositories, run `npm ci` and `npm run build:latex` in CI with a fixed TeX Live environment containing the required engines, packages, and fonts. Upload the resulting `public/` directly to your hosting provider instead of committing generated PDFs or publication output. Cloudflare Pages supports [deployment from GitHub Actions with Wrangler](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/); existing Git-integrated projects can disable automatic builds and accept Wrangler deployments. Keep the site's workflow and hosting credentials in the consuming repository. The hosting service does not need LaTeX or separate object storage to serve PDFs within its file-size limit.
 
 Pin the framework release and commit `package-lock.json`. Use `npm ci` on a fresh checkout. To upgrade, install the new release archive, review the dependency and lockfile changes, and rebuild the site. For a local toolkit checkout, see [Update a local site](DEVELOPMENT.md#-update-a-local-site).
 
