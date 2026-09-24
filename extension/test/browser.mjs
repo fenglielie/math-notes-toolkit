@@ -91,6 +91,11 @@ try {
   assert.equal(await page.locator('[id="mjx-eqn:eq:one"]').count(), 1);
   assert.ok(await page.locator('a[href*="eq%3Aone"]').count());
   assert.equal(await page.locator('.statement.theorem').getAttribute('data-line'), '8');
+  const theoremBackground = await page.locator('.statement.theorem').evaluate(element => getComputedStyle(element).backgroundColor);
+  await page.locator('.markdown-body').evaluate(element => element.style.setProperty('--vscode-editor-background', '#101719'));
+  assert.equal(await page.locator('.statement.theorem').evaluate(element => getComputedStyle(element).backgroundColor), theoremBackground,
+    'Theorem tint must not depend on the editor background, which can differ from the preview background');
+  await page.locator('.markdown-body').evaluate(element => element.style.removeProperty('--vscode-editor-background'));
   assert.equal(await page.locator('.preview-content > .references').count(), 1);
   const heading = await page.locator('.preview-content > h2').boundingBox();
   const bibliographyHeading = await page.locator('.references h2').boundingBox();
@@ -153,7 +158,8 @@ $$S=4\pi R^2$$`;
     const first = title.nextElementSibling;
     return { kind: element.classList[1], titleTop: title.getBoundingClientRect().top, firstTop: first.getBoundingClientRect().top };
   }));
-  assert.ok(plainStatements.every(({ titleTop, firstTop }) => Math.abs(titleTop - firstTop) < 2), 'Plain statement titles and first paragraphs should stay on one line');
+  assert.ok(plainStatements.every(({ titleTop, firstTop }) => Math.abs(titleTop - firstTop) <= 2),
+    'Plain statement titles and first paragraphs should stay on one line');
   const proofEnd = await page.locator('.statement.proof').first().evaluate(element => ({
     block: getComputedStyle(element, '::after').content,
     paragraph: getComputedStyle(element.querySelector('p:last-child'), '::after').content

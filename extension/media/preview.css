@@ -1,5 +1,4 @@
 .markdown-body {
-  --mn-bg: var(--vscode-editor-background, #fbfcfc);
   --mn-border: var(--vscode-panel-border, #dfeaec);
   --mn-link: var(--vscode-textLink-foreground, #0b8298);
   --mn-theorem: #75429a;
@@ -11,7 +10,6 @@
   --mn-tint: 8%;
 }
 .vscode-dark .markdown-body, .vscode-high-contrast .markdown-body {
-  --mn-bg: var(--vscode-editor-background, #101719);
   --mn-border: var(--vscode-panel-border, #2c3e43);
   --mn-link: var(--vscode-textLink-foreground, #62b3c1);
   --mn-theorem: #c6a0e4;
@@ -25,7 +23,7 @@
 .markdown-body .statement {
   --mn-accent: var(--mn-theorem);
   border: 2px solid var(--mn-accent);
-  background: color-mix(in srgb, var(--mn-accent) var(--mn-tint), var(--mn-bg));
+  background: color-mix(in srgb, var(--mn-accent) var(--mn-tint), transparent);
   padding: 1px 16px 3px;
   margin: 16px 0;
 }
