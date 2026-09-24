@@ -4,7 +4,7 @@ title: Extended Markdown examples
 
 # Extended Markdown examples
 
-This file can be previewed on its own. See `SYNTAX.md` for the complete rules.
+This file can be previewed on its own. For complete rules, see the [syntax reference](../SYNTAX.md).
 
 ## Mathematics
 

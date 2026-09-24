@@ -6,6 +6,13 @@ import { createHash } from 'node:crypto';
 
 const execute = promisify(execFile);
 
+export function packedArtifact(stdout, name) {
+  const result = JSON.parse(stdout);
+  const artifact = Array.isArray(result) ? result[0] : result[name];
+  if (!artifact?.filename || !Array.isArray(artifact.files)) throw new Error('npm pack returned no package metadata for ' + name);
+  return artifact;
+}
+
 // Local release transport. Source remains in its own repository; consumers install snapshots.
 export async function syncPackage(name, sourceArgument) {
   if (!sourceArgument) throw new Error('Supply the source repository directory.');
@@ -24,7 +31,7 @@ export async function syncPackage(name, sourceArgument) {
   await fs.mkdir(cache, { recursive: true });
   const temporary = await fs.mkdtemp(path.join(cache, 'package-'));
   // The check above validates the source; pack without executing the same checks again.
-  const packed = JSON.parse(await run(['pack', '--json', '--ignore-scripts', '--pack-destination', temporary], source))[0];
+  const packed = packedArtifact(await run(['pack', '--json', '--ignore-scripts', '--pack-destination', temporary], source), name);
   const data = await fs.readFile(path.join(temporary, packed.filename));
   const digest = createHash('sha256').update(data).digest('hex').slice(0, 12);
   const filename = name + '-' + sourceManifest.version + '-' + digest + '.tgz';

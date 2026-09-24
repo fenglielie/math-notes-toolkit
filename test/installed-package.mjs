@@ -7,6 +7,7 @@ import { promisify } from 'node:util';
 import { once } from 'node:events';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
+import { packedArtifact } from '../scripts/sync-package.mjs';
 
 const execute = promisify(execFile);
 const project = fileURLToPath(new URL('../', import.meta.url));
@@ -18,7 +19,7 @@ const run = (args, cwd = site) => execute(process.execPath, args, { cwd, windows
 let server;
 try {
   const result = await run([npm, 'pack', '--json', '--ignore-scripts', '--pack-destination', temporary], project);
-  const archive = JSON.parse(result.stdout)[0];
+  const archive = packedArtifact(result.stdout, 'math-notes-cli');
   assert.ok(archive.files.every(file => !file.path.startsWith('node_modules/') && !file.path.startsWith('extension/media/')), 'Node package must not bundle dependencies or editor resources');
   const bundle = path.join(temporary, archive.filename);
   await run([path.join(project, 'bin/math-notes-cli.mjs'), 'init', site], temporary);

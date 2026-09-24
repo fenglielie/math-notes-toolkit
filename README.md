@@ -1,6 +1,6 @@
 # Math Notes Toolkit
 
-A toolkit for mathematical Markdown: a shared renderer, a static notes website framework, and a companion VS Code extension. Use it to write mathematical notes, publish a static website, or preview Markdown in VS Code.
+A toolkit for mathematical Markdown: a shared renderer, a static notes website framework, and a VS Code preview extension.
 
 | Use | Entry point |
 | --- | --- |
@@ -9,9 +9,7 @@ A toolkit for mathematical Markdown: a shared renderer, a static notes website f
 | Extend a markdown-it parser | math-notes-cli/core |
 | Preview Markdown in VS Code | Markdown Math Preview VSIX |
 
-Supports offline MathJax formulas, AMS numbering and references, theorem and proof blocks, embedded BibTeX citations, highlights, footnotes, and restricted images. Read [SYNTAX.md](SYNTAX.md) and [examples/syntax-guide.md](examples/syntax-guide.md).
-
-Quick links: [📥 Downloads](https://github.com/fenglielie/math-notes-toolkit/releases) · [🌐 Website usage](#-website-usage) · [🧩 VS Code preview](#-vs-code-preview) · [📖 Syntax](SYNTAX.md) · [🛠️ Developer guide](DEVELOPMENT.md).
+The renderer supports offline MathJax formulas, theorem blocks, BibTeX citations, highlights, footnotes, and restricted images. See [SYNTAX.md](SYNTAX.md) for the rules and [examples/syntax-guide.md](examples/syntax-guide.md) for a complete example. Toolkit development and releases are covered in [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## 🚀 Build a website
 
@@ -25,7 +23,7 @@ npx --no-install math-notes-cli dev
 npx --no-install math-notes-cli build
 ```
 
-From a directory where the CLI is installed, use `npx --no-install math-notes-cli init path/to/site` to create an empty site, then install the package in that site. Keep content, attachments, configuration, and branding in the site repository. See [Website usage](#-website-usage) for authoring, PDFs, encryption, deployment, and configuration.
+From a directory where the CLI is installed, run `npx --no-install math-notes-cli init path/to/site` to create a site. Install the package in that site, and keep your content and configuration there.
 
 ## 💻 Render from Node.js
 
@@ -37,7 +35,7 @@ const { html, css, toc, wordCount } = await renderMarkdown('Inline math: $x^2$.'
 
 Pass the Markdown body after processing front matter. The optional synchronous resolveLink callback rewrites parsed link and image URLs. Invalid syntax or TeX rejects rendering. The returned CSS contains MathJax rules; the host supplies page, statement, and bibliography styles. Shared highlight styles are exported at math-notes-cli/styles/highlights.css.
 
-The /core export provides syntax plugins and word-count utilities; /preset provides shared mathematical settings and statement presets.
+The `/core` export provides syntax plugins and word-count utilities; `/preset` provides shared mathematical settings and statement presets.
 
 ## 🧩 VS Code preview
 
@@ -50,10 +48,6 @@ Download `markdown-math-preview-VERSION.vsix` from [GitHub Releases](https://git
 Run the CLI from your site directory. `math-notes-cli dev` watches source files and serves in-memory builds; `math-notes-cli build` writes `public/`; `math-notes-cli build:latex` compiles referenced LaTeX sources before building. All accept `--config path/to/config.mjs`, relative to the site directory. The development port defaults to 4321 and increases when occupied; set `PORT` to choose another starting port.
 
 Only content, configuration, and personal resources belong in a site repository. Framework scripts, default assets, tests, and generic examples belong in this package. Installed code must not be edited directly.
-
-### Rendering guarantees
-
-Escaped math delimiters remain literal text. Statement markers inside fenced or indented code remain literal, including fences introduced by list markers. Heading IDs and table-of-contents targets are unique within each article, including when a title already contains a numeric suffix. See `SYNTAX.md` and `content-demo/writing-guide.md` for authoring examples.
 
 ### Configuration
 
@@ -107,7 +101,7 @@ Drafts appear in local preview but are excluded from publication. Draft attachme
 
 ### Markdown extensions
 
-The syntax contract is maintained in `SYNTAX.md`. Supported features include `$...$`, `\(...\)`, `$$...$$`, `\[...\]`, AMS environments and equation references, eleven statement kinds, embedded BibTeX citations, yellow/green/pink highlights, footnotes, and restricted image attributes.
+The complete rules are in [SYNTAX.md](SYNTAX.md). Math, statement blocks, and citations can appear together:
 
 ```markdown
 {% theorem begin Example %}
@@ -121,7 +115,7 @@ See [@sample].
 {% bibtex end %}
 ```
 
-The statement kinds are theorem, lemma, proposition, corollary, definition, example, problem, proof, solution, remark, and note. Their labels are English; content can use other languages. Unsupported HTML is escaped. Math is rendered during the build with strict validation; invalid TeX fails the build. Citations produce a References section with links and backlinks.
+Invalid TeX fails the build. Unsupported HTML is escaped, and citations produce a References section with links and backlinks.
 
 The separately installed Markdown Math Preview extension can preview the same syntax in VS Code, with native scroll synchronization. Use the website preview to check full site layout, PDFs, and encrypted articles.
 
@@ -152,7 +146,7 @@ The password remains in the private source repository and is not copied into gen
 
 Deploy only `public/`. Default builds require Node.js and existing PDFs but no LaTeX tools. Build output is replaced only after generation succeeds; temporary file locks are retried and a failed replacement restores the previous output.
 
-For source-only repositories, run `npm ci` and `npm run build:latex` in CI with a fixed TeX Live environment containing the required engines, packages, and fonts. Upload the resulting `public/` directly to your hosting provider instead of committing generated PDFs or publication output. Cloudflare Pages supports [deployment from GitHub Actions with Wrangler](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/); existing Git-integrated projects can disable automatic builds and accept Wrangler deployments. Keep the site's workflow and hosting credentials in the consuming repository. The hosting service does not need LaTeX or separate object storage to serve PDFs within its file-size limit.
+For source-only repositories, run `npm ci` and `npm run build:latex` in CI with a fixed TeX Live environment, then deploy `public/`. Cloudflare Pages supports [direct upload from GitHub Actions with Wrangler](https://developers.cloudflare.com/pages/how-to/use-direct-upload-with-continuous-integration/). Keep hosting credentials in the site repository.
 
 Pin the framework release and commit `package-lock.json`. Use `npm ci` on a fresh checkout. To upgrade, install the new release archive, review the dependency and lockfile changes, and rebuild the site. For a local toolkit checkout, see [Update a local site](DEVELOPMENT.md#-update-a-local-site).
 

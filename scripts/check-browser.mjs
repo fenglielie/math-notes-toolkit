@@ -220,7 +220,7 @@ try {
   await page.locator('.footnote-ref a').first().click();
   await page.waitForFunction(() => document.querySelector('.footnotes li.jump-highlight'));
   await checkJumpPosition(page);
-  await page.locator('.footnotes li.jump-highlight .footnote-backref').first().click();
+  await page.locator('.footnotes li .footnote-backref').first().click();
   await page.waitForFunction(() => document.querySelector('.footnote-ref')?.closest('p').classList.contains('jump-highlight'));
   assert.equal(await page.locator('.toc a[href="#bib:references"]').count(), 1);
   const python = page.locator('.code-block').filter({ has: page.locator('code.language-python') }).first();

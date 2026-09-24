@@ -1,6 +1,6 @@
 # 🛠️ Development and releases
 
-For installation and authoring, see [README.md](README.md). This guide covers work on the toolkit itself.
+For installation and authoring, see [README.md](README.md).
 
 Keep actual notes and site configuration in a separate repository. This toolkit has one root npm package, math-notes-cli, and one shared version defined by the root `package.json`. Node.js 22.13+ is required. Run all development commands from this repository root:
 
@@ -25,7 +25,7 @@ npm run dev:demo
 
 Edit shared syntax in `src/core/`, `SYNTAX.md`, and `examples/`; edit VS Code integration in `extension/src/`. Both hosts import the shared renderer source directly.
 
-The extension manifest describes a VS Code product, not another installed npm package. Dependencies and the lockfile live only at the root. Build commands synchronize its version from the root manifest and generate its examples, highlight CSS, and offline resources. The extension links to the root syntax reference instead of bundling a duplicate. No internal tarballs, Git dependencies, or bundleDependencies connect the components.
+The extension is built from the root package; dependencies and the lockfile live only there. Its build synchronizes the version and copies examples, the shared `SYNTAX.md`, highlight CSS, and offline resources into the VSIX. Keep the source syntax reference at the repository root and a self-contained user guide in `extension/README.md`.
 
 ## 🧪 Build and test
 
@@ -95,7 +95,5 @@ node -p "require('./package.json').version"
    ```
 
 5. Open the repository's **Releases** page on GitHub and create a new release using tag `vVERSION`. Add release notes describing changes, requirements, and known limitations. Upload both files from step 2, then publish the release. GitHub's automatically generated source archives do not replace these installation files. For a trial release, select **Set as a pre-release**.
-
-User installation instructions are in [README.md](README.md). Keep extension builds out of install lifecycle hooks.
 
 These steps publish a GitHub Release; npm registry and VS Code Marketplace publication are separate processes. The project currently uses `UNLICENSED`; no open-source license has been selected.
