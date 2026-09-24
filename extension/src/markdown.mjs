@@ -4,7 +4,7 @@ import { mathPlugin, statements, citations, highlights, htmlImages, statementKin
 export function extendMarkdownIt(md) {
   const escape = md.utils.escapeHtml;
   const references = citations();
-  md.set({ html: false });
+  md.set({ html: false, breaks: false, linkify: true });
   if (!md.renderer.rules.footnote_ref) md.use(footnote);
   md.use(mathPlugin).use(htmlImages).use(highlights).use(references.plugin);
   md.use(statements, { kinds: statementKinds, renderOpen: renderStatementOpen });

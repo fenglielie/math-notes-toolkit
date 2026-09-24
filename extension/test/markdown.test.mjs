@@ -4,6 +4,16 @@ import MarkdownIt from 'markdown-it';
 import { liteAdaptor } from '@mathjax/src/js/adaptors/liteAdaptor.js';
 import { extendMarkdownIt } from '../src/markdown.mjs';
 
+test('preview keeps soft line breaks and bare links consistent with the site', () => {
+  const md = extendMarkdownIt(new MarkdownIt({ breaks: true }));
+  for (const kind of ['remark', 'proof', 'note', 'solution']) {
+    const html = md.render(`{% ${kind} begin %}\nFirst line\nsecond line\n{% ${kind} end %}`);
+    assert.match(html, /First line\nsecond line/);
+    assert.doesNotMatch(html, /<br\s*\/?\s*>/);
+  }
+  assert.match(md.render('https://example.com'), /<a href="https:\/\/example.com">https:\/\/example.com<\/a>/);
+});
+
 test('editor blocks retain original source lines including front matter and nested statements', () => {
   const md = extendMarkdownIt(new MarkdownIt());
   const source = ['---', 'title: Example', '---', '', '{% theorem begin Test %}',

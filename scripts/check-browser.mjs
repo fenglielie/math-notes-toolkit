@@ -604,6 +604,11 @@ try {
         if (route.endsWith('/note/')) assert.equal(await draftPage.locator('.article-status > .draft-badge').count(), 1);
         if (route === '/search/') assert.equal(await draftPage.locator('#search-results article').count(), 2);
         if (route.endsWith('/note/')) assert.match(await draftPage.locator('.draft-notice').textContent(), /Unpublished · local preview only/);
+        if (route.endsWith('/note/')) {
+          const navigation = await draftPage.locator('.note-navigation').boundingBox();
+          const footer = await draftPage.locator('.site-footer').boundingBox();
+          assert.ok(footer.y - navigation.y - navigation.height < 70, 'Short article navigation should sit above the footer');
+        }
         assert.ok(await draftPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
         await draftPage.screenshot({ path: '.cache/draft-' + (route === '/search/' ? 'search' : route.endsWith('/note/') ? 'article' : 'list') + '-' + width + '-' + theme + '.png' });
       }

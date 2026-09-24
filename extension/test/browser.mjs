@@ -148,6 +148,17 @@ $$S=4\pi R^2$$`;
   await settled();
   assert.equal(await page.locator('.markdown-math-error').count(), 0, await page.locator('body').innerText());
   assert.equal(await page.locator('.statement').count(), 11);
+  const plainStatements = await page.locator('.statement:is(.proof,.solution,.remark,.note)').evaluateAll(elements => elements.map(element => {
+    const title = element.querySelector('.statement-title');
+    const first = title.nextElementSibling;
+    return { kind: element.classList[1], titleTop: title.getBoundingClientRect().top, firstTop: first.getBoundingClientRect().top };
+  }));
+  assert.ok(plainStatements.every(({ titleTop, firstTop }) => Math.abs(titleTop - firstTop) < 2), 'Plain statement titles and first paragraphs should stay on one line');
+  const proofEnd = await page.locator('.statement.proof').first().evaluate(element => ({
+    block: getComputedStyle(element, '::after').content,
+    paragraph: getComputedStyle(element.querySelector('p:last-child'), '::after').content
+  }));
+  assert.deepEqual(proofEnd, { block: 'none', paragraph: '"□"' });
   assert.equal(await page.locator('.references li').count(), 2);
   assert.equal(await page.locator('.text-highlight').count(), 3);
   await page.locator('img').scrollIntoViewIfNeeded();
