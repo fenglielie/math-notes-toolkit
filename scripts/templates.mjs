@@ -9,6 +9,8 @@ export function templates(config) {
   const date = d => d ? '<time datetime="' + e(d) + '">' + e(d.replaceAll('-', '.')) + '</time>' : '';
   const draftBadge = note => note.draft ? '<span class="draft-badge" lang="en">Draft</span>' : '';
   const encryptedBadge = note => note.encrypted ? '<span class="encrypted-badge" lang="en">Encrypted</span>' : '';
+  const neighbor = (note, direction, label) => note ? '<div class="' + direction + '"><span class="neighbor-label">' + label + '</span><a rel="' + direction + '" href="' + e(note.href) + '">' + e(note.title) + '</a>' + draftBadge(note) + encryptedBadge(note) + '</div>' : '';
+  const navigation = ({ previous, next } = {}) => previous || next ? '<nav class="note-navigation" aria-label="Article navigation">' + neighbor(previous, 'prev', 'Previous') + neighbor(next, 'next', 'Next') + '</nav>' : '';
   const noteIcon = pdf => '<svg class="note-icon' + (pdf ? ' note-icon-pdf' : '') + '" viewBox="0 0 20 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 2h8l5 5v15H4z"/><path d="M12 2v5h5M7 12h7M7 16h5"/></svg>';
   const list = posts => '<div class="note-list">' + posts.map(p => '<article class="note-row"><h2><a href="' + p.href + '">' + noteIcon(p.pdf) + '<span>' + e(p.title) + draftBadge(p) + '</span>' + (p.pdf ? '<span class="sr-only"> (PDF)</span>' : '') + '</a>' + encryptedBadge(p) + '</h2><div class="tags">' + tags(p.tags) + '</div></article>').join('') + '</div>';
   const footer = { label: '@' + (config.author || 'Your Name'), url: config.homepage || 'https://example.com', ...config.footer };
@@ -44,24 +46,22 @@ export function templates(config) {
     const license = rights.licenseUrl ? '<a rel="license" href="' + e(rights.licenseUrl) + '">' + e(rights.license) + '</a>' : e(rights.license || '');
     const notice = rights.license ? 'Unless otherwise stated, this article is licensed under ' + license + '.' : 'All rights reserved.';
     const copyright = '<aside class="article-copyright" aria-label="Copyright notice"><p><strong>Author:</strong> <a href="' + e(authorUrl) + '">' + e(author) + '</a></p><p><strong>Link:</strong> <a class="permalink" href="' + e(permalink) + '">' + e(permalink) + '</a></p><p><strong>Copyright Notice:</strong> ' + notice + '</p></aside>';
-    const neighbor = (note, direction, label) => note ? '<div class="' + direction + '"><span class="neighbor-label">' + label + '</span><a rel="' + direction + '" href="' + e(note.href) + '">' + e(note.title) + '</a>' + draftBadge(note) + encryptedBadge(note) + '</div>' : '';
-    const navigation = previous || next ? '<nav class="note-navigation" aria-label="Article navigation">' + neighbor(previous, 'prev', 'Previous') + neighbor(next, 'next', 'Next') + '</nav>' : '';
-    const end = '<div class="article-end" lang="en">' + copyright + (p.tags.length ? '<div class="tags article-tags" aria-label="Article tags">' + tags(p.tags) + '</div>' : '') + navigation + '</div>';
+    const end = '<div class="article-end" lang="en">' + copyright + (p.tags.length ? '<div class="tags article-tags" aria-label="Article tags">' + tags(p.tags) + '</div>' : '') + '</div>';
     const count = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(p.wordCount).toLowerCase();
     const words = '<span class="word-count" lang="en">' + count + (p.wordCount === 1 ? ' word' : ' words') + '</span>';
     const attachment = p.pdf && p.pages ? '<span class="attachment-pages" lang="en">Attachment: ' + p.pages + (p.pages === 1 ? ' page' : ' pages') + '</span>' : '';
     const draftNotice = p.draft ? '<p class="draft-notice" lang="en">' + draftBadge(p) + '<span>Unpublished · local preview only</span></p>' : '';
-    const body = '<div class="article-layout"><article class="note" lang="' + e(p.lang) + '"><header class="article-header">' + draftNotice + '<h1>' + e(p.title) + '</h1><div class="article-meta">' + encryptedBadge(p) + date(p.date) + words + attachment + (p.tags.length ? '<div class="tags article-tags header-tags" aria-label="Article tags">' + tags(p.tags) + '</div>' : '') + '</div></header>' + toc + '<div class="prose">' + rendered.html + '</div>' + pdf + end + '</article></div>';
-    return fragment ? body : layout(p.title, body, { current: 'Notes', route: p.route, css: rendered.css });
+    const article = '<article class="note" lang="' + e(p.lang) + '"><header class="article-header">' + draftNotice + '<h1>' + e(p.title) + '</h1><div class="article-meta">' + encryptedBadge(p) + date(p.date) + words + attachment + (p.tags.length ? '<div class="tags article-tags header-tags" aria-label="Article tags">' + tags(p.tags) + '</div>' : '') + '</div></header>' + toc + '<div class="prose">' + rendered.html + '</div>' + pdf + end + '</article>';
+    return fragment ? article : layout(p.title, '<div class="article-layout">' + article + navigation({ previous, next }) + '</div>', { current: 'Notes', route: p.route, css: rendered.css });
   }
-  function lockedPost(p, envelope) {
+  function lockedPost(p, envelope, neighbors) {
     const data = JSON.stringify(envelope).replaceAll('<', '\\u003c');
     return layout(p.title, '<div class="article-layout"><article class="encrypted-note"><header class="article-header">' +
       (p.draft ? '<p class="draft-notice" lang="en">' + draftBadge(p) + '<span>Unpublished · local preview only</span></p>' : '') +
       '<h1>' + e(p.title) + '</h1><div class="article-meta">' + encryptedBadge(p) + date(p.date) + '<div class="tags">' + tags(p.tags) + '</div></div></header>' +
       '<section class="unlock-panel" aria-labelledby="unlock-heading"><h2 id="unlock-heading">Encrypted article</h2><p>Enter the password to read this article.</p>' +
       '<form class="unlock-form"><label for="article-password">Password</label><div class="unlock-controls"><input id="article-password" type="password" autocomplete="current-password" required disabled aria-describedby="unlock-status"><button type="submit" disabled>Unlock</button></div><p id="unlock-status" role="alert"></p></form>' +
-      '<noscript><p>Enable JavaScript to unlock this article.</p></noscript></section></article></div><script id="encrypted-article" type="application/json" data-context="' + e(p.href) + '">' + data + '</script>',
+      '<noscript><p>Enable JavaScript to unlock this article.</p></noscript></section></article>' + navigation(neighbors) + '</div><script id="encrypted-article" type="application/json" data-context="' + e(p.href) + '">' + data + '</script>',
       { current: 'Notes', route: p.route });
   }
   function searchPage(posts) {

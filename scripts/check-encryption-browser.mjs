@@ -10,6 +10,7 @@ export async function checkEncryptionBrowser(browser) {
   let server, context;
   try {
     await createEncryptionFixture(root);
+    await fs.writeFile(path.join(root, 'content/earlier.md'), '---\ntitle: A public note\nslug: cccccccccccc\n---\nPublic text');
     const { output } = await build({ root });
     server = http.createServer((request, response) => {
       const url = new URL(request.url, 'http://localhost');
@@ -33,6 +34,14 @@ export async function checkEncryptionBrowser(browser) {
     await page.getByRole('searchbox').fill(secretText);
     await page.waitForFunction(() => document.querySelector('.search-status').textContent.startsWith('No matching'));
     await page.goto(articleUrl);
+    assert.equal(await page.locator('.note-navigation').count(), 1);
+    assert.equal(await page.locator('.note-navigation .prev a').getAttribute('href'), '/sub/en/cccccccccccc/');
+    assert.equal(await page.locator('.note-navigation .next a').getAttribute('href'), '/sub/en/aaaaaaaaaaaa/');
+    await page.locator('.note-navigation .prev a').click();
+    assert.equal(page.url(), origin + '/sub/en/cccccccccccc/');
+    await page.goBack();
+    await page.locator('.unlock-form').waitFor();
+    await page.locator('.note-navigation').evaluate(element => { element.dataset.persist = 'true'; });
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 900 });
       for (const theme of ['light', 'dark']) {
@@ -49,6 +58,8 @@ export async function checkEncryptionBrowser(browser) {
     await page.getByLabel('Password', { exact: true }).fill(testPassword);
     await page.getByRole('button', { name: 'Unlock', exact: true }).click();
     await page.locator('.prose').waitFor();
+    assert.equal(await page.locator('.note-navigation').count(), 1);
+    assert.equal(await page.locator('.note-navigation').getAttribute('data-persist'), 'true');
     assert.match(await page.locator('.prose').textContent(), new RegExp(secretText));
     assert.ok(await page.locator('.prose mjx-container svg').count() > 0);
     assert.equal(await page.locator('.toc details').getAttribute('data-state'), 'collapsed');

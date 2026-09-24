@@ -221,7 +221,7 @@ export async function generate({ root = process.cwd(), configFile = 'site.config
       const attachments = [];
       for (const [file, id] of articleAssets) attachments.push({ id, name: path.basename(file), type: mediaTypes[path.extname(file).toLowerCase()] || 'application/octet-stream', data: (await fs.readFile(file)).toString('base64') });
       const envelope = await encryptArticle({ html: t.post(p, rendered, { ...neighbors, fragment: true }), css: rendered.css, attachments }, p.password, p.href);
-      await write(p.route + 'index.html', t.lockedPost(p, envelope));
+      await write(p.route + 'index.html', t.lockedPost(p, envelope, neighbors));
     } else await write(p.route + 'index.html', t.post(p, rendered, neighbors));
     // Encrypted PDF viewers are empty shells; the unlocked parent supplies a blob.
     if (p.pdf) await write(p.route + 'pdf.html', t.pdfViewer(p.encrypted ? { ...p, pdfHref: '' } : p, pdfResources));

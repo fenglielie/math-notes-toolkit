@@ -60,13 +60,19 @@ test('build and dev encrypt whole articles and local assets without leaking into
   const root = await fs.mkdtemp(path.resolve('.cache/encryption-test-'));
   try {
     await createEncryptionFixture(root);
+    await fs.writeFile(path.join(root, 'content/earlier.md'), '---\ntitle: A public note\nslug: cccccccccccc\n---\nPublic text');
     const result = await build({ root });
     const route = 'en/' + privateSlug + '/';
     const html = result.output.get(route + 'index.html').toString();
     assert.match(html, /Encrypted article/);
     assert.match(html, /type="password"[^>]*disabled/);
     assert.doesNotMatch(html, /class="toc"|class="prose"|class="pdf-viewer"/);
+    const nav = html.match(/<nav class="note-navigation"[^>]*>[\s\S]*?<\/nav>/)?.[0];
+    assert.ok(nav);
+    assert.match(nav, /class="prev"[^>]*>[\s\S]*href="\/sub\/en\/cccccccccccc\/"/);
+    assert.match(nav, /class="next"[^>]*>[\s\S]*href="\/sub\/en\/aaaaaaaaaaaa\/"/);
     const payload = await decryptArticle(envelopeFrom(html), testPassword, '/sub/' + route);
+    assert.doesNotMatch(payload.html, /note-navigation/);
     assert.match(payload.html, new RegExp(secretText));
     assert.match(payload.html, new RegExp(secretHeading));
     assert.match(payload.html, /class="toc"/);

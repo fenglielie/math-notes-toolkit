@@ -301,7 +301,7 @@ mark { background:var(--border); color:var(--text); }
 @media print {
   body { display:block; min-height:0; }
   :root,:root[data-theme],:root:not([data-theme]) { color-scheme:light; --bg:#fff; --text:#000; --muted:#444; --secondary:#333; --accent:#000; --border:#ccc; --soft:#f6f6f6; }
-  .site-header,.site-footer,.toc,.copy-tex,.article-end,.pdf-viewer { display:none; }
+  .site-header,.site-footer,.toc,.copy-tex,.article-end,.note-navigation,.pdf-viewer { display:none; }
   main { width:100%; }
   .article-layout { display:block; padding:0; }
   .article-header { margin-bottom:20px; }

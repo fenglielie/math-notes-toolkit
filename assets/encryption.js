@@ -47,7 +47,7 @@ export function initializeEncryption(initializeArticle) {
       style.textContent = payload.css;
       document.head.append(style);
       input.value = '';
-      document.querySelector('main').replaceChildren(template.content);
+      document.querySelector('.encrypted-note').replaceWith(template.content);
       initializeArticle();
       const heading = document.querySelector('.article-header h1');
       heading.tabIndex = -1;
