@@ -2,7 +2,7 @@
   "name": "markdown-math-preview",
   "displayName": "Markdown Math Preview",
   "description": "Math and style enhancements for VS Code Markdown preview, with offline MathJax, theorem blocks, and BibTeX citations.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "markdown-math-local",
   "private": true,
   "license": "UNLICENSED",
