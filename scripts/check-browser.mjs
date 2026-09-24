@@ -90,8 +90,9 @@ try {
   assert.deepEqual(await iconResponse.body(), await fs.readFile(config.icon));
   assert.equal(await page.locator('.note-row time, .note-date').count(), 0);
   assert.equal(await page.locator('.note-row p, .format, .note-arrow, .intro').count(), 0);
-  assert.equal(await page.locator('.site-footer a').textContent(), config.footer.label);
-  assert.equal(await page.locator('.site-footer a').getAttribute('href'), config.footer.url);
+  assert.equal(await page.locator('.site-footer .all-notes').textContent(), 'All notes');
+  assert.equal(await page.locator('.site-footer .all-notes').getAttribute('href'), origin + '/');
+  assert.equal(await page.locator('.site-footer .footer-text').textContent(), config.footer);
   const homeBrand = await page.locator('.brand').boundingBox(), homeNav = await page.locator('.site-header nav').boundingBox();
   await page.goto(origin + demoHref);
   for (const [selector, expected] of [['.brand', homeBrand], ['.site-header nav', homeNav]]) {
@@ -599,6 +600,8 @@ try {
         await draftPage.evaluate(value => { document.documentElement.dataset.theme = value; }, theme);
         await draftPage.locator(selector + ' .draft-badge').waitFor();
         assert.equal(await draftPage.locator(selector + ' .draft-badge').count(), 1);
+        if (route === '/draft-ui/') assert.equal(await draftPage.locator('.note-row h2 a .draft-badge').count(), 1);
+        if (route.endsWith('/note/')) assert.equal(await draftPage.locator('.article-status > .draft-badge').count(), 1);
         if (route === '/search/') assert.equal(await draftPage.locator('#search-results article').count(), 2);
         if (route.endsWith('/note/')) assert.match(await draftPage.locator('.draft-notice').textContent(), /Unpublished · local preview only/);
         assert.ok(await draftPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth));

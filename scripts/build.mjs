@@ -55,6 +55,7 @@ export async function generate({ root = process.cwd(), configFile = 'site.config
   const config = await loadConfig(root, configFile);
   config.pageSize ??= 10;
   if (!Number.isSafeInteger(config.pageSize) || config.pageSize < 1) throw new Error('pageSize must be a positive integer.');
+  if (config.footer != null && typeof config.footer !== 'string') throw new Error('footer must be plain text.');
   config.base = '/' + (config.base || '/').split('/').filter(Boolean).join('/');
   if (!config.base.endsWith('/')) config.base += '/';
   if (config.url) {

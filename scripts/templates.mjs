@@ -9,18 +9,20 @@ export function templates(config) {
   const date = d => d ? '<time datetime="' + e(d) + '">' + e(d.replaceAll('-', '.')) + '</time>' : '';
   const draftBadge = note => note.draft ? '<span class="draft-badge" lang="en">Draft</span>' : '';
   const encryptedBadge = note => note.encrypted ? '<span class="encrypted-badge" lang="en">Encrypted</span>' : '';
+  const articleStatus = note => note.draft || note.encrypted ? '<p class="article-status' + (note.draft ? ' draft-notice' : '') + '" lang="en">' + draftBadge(note) + encryptedBadge(note) + (note.draft ? '<span>Unpublished · local preview only</span>' : '') + '</p>' : '';
   const neighbor = (note, direction, label) => note ? '<div class="' + direction + '"><span class="neighbor-label">' + label + '</span><a rel="' + direction + '" href="' + e(note.href) + '">' + e(note.title) + '</a>' + draftBadge(note) + encryptedBadge(note) + '</div>' : '';
   const navigation = ({ previous, next } = {}) => previous || next ? '<nav class="note-navigation" aria-label="Article navigation">' + neighbor(previous, 'prev', 'Previous') + neighbor(next, 'next', 'Next') + '</nav>' : '';
   const noteIcon = pdf => '<svg class="note-icon' + (pdf ? ' note-icon-pdf' : '') + '" viewBox="0 0 20 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 2h8l5 5v15H4z"/><path d="M12 2v5h5M7 12h7M7 16h5"/></svg>';
-  const list = posts => '<div class="note-list">' + posts.map(p => '<article class="note-row"><h2><a href="' + p.href + '">' + noteIcon(p.pdf) + '<span>' + e(p.title) + draftBadge(p) + '</span>' + (p.pdf ? '<span class="sr-only"> (PDF)</span>' : '') + '</a>' + encryptedBadge(p) + '</h2><div class="tags">' + tags(p.tags) + '</div></article>').join('') + '</div>';
-  const footer = { label: '@' + (config.author || 'Your Name'), url: config.homepage || 'https://example.com', ...config.footer };
+  const list = posts => '<div class="note-list">' + posts.map(p => '<article class="note-row"><h2><a href="' + p.href + '">' + noteIcon(p.pdf) + '<span>' + e(p.title) + draftBadge(p) + encryptedBadge(p) + '</span>' + (p.pdf ? '<span class="sr-only"> (PDF)</span>' : '') + '</a></h2><div class="tags">' + tags(p.tags) + '</div></article>').join('') + '</div>';
+  const allNotesUrl = config.url ? config.url + base : base;
+  const footerText = config.footer || '';
   function layout(title, body, { current = '', route = '', css = '', noindex = false } = {}) {
     return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>' + e(title === config.title ? title : title + ' · ' + config.title) + '</title>' +
       (noindex ? '<meta name="robots" content="noindex">' : config.url ? '<link rel="canonical" href="' + e(config.url + link(route)) + '">' : '') +
       '<link rel="icon" href="' + e(config.iconHref || link('favicon.svg')) + '" type="' + e(config.iconType || 'image/svg+xml') + '"><script src="' + link('assets/theme.js') + '"></script><link rel="stylesheet" href="' + link('assets/style.css') + '">' +
       (css ? '<style>' + css + '</style>' : '') + '<script type="module" src="' + link('assets/app.js') + '"></script></head><body data-base="' + e(base) + '" data-page-size="' + (config.pageSize ?? 10) + '"><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="brand" href="' + base + '">' + e(config.title) + '</a><nav aria-label="Main navigation">' +
       '<a href="' + link('search/') + '"' + (current === 'Search' ? ' aria-current="page"' : '') + '>Search</a>' +
-      '</nav></header><main id="main">' + body + '</main><footer class="site-footer"><a href="' + e(footer.url) + '">' + e(footer.label) + '</a><div class="footer-actions"><button id="back-to-top" class="back-to-top" type="button">Back to top</button><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle color theme"><span class="theme-label-light">Light</span><span class="theme-label-dark">Dark</span></button></div></footer></body></html>';
+      '</nav></header><main id="main">' + body + '</main><footer class="site-footer"><div class="footer-bar"><a class="all-notes" href="' + e(allNotesUrl) + '">All notes</a><div class="footer-actions"><button id="back-to-top" class="back-to-top" type="button">Back to top</button><button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle color theme"><span class="theme-label-light">Light</span><span class="theme-label-dark">Dark</span></button></div></div>' + (footerText ? '<p class="footer-text">' + e(footerText) + '</p>' : '') + '</footer></body></html>';
   }
   function home(posts, requestedPage = 1) {
     const { page, totalPages, items } = paginate(posts, requestedPage, config.pageSize ?? 10);
@@ -41,7 +43,7 @@ export function templates(config) {
     const toc = contents ? '<aside class="toc"><details open><summary><span>Contents</span></summary><nav aria-label="Table of contents"><ol>' + contents + '</ol></nav></details></aside>' : '';
     const pdf = p.pdfHref ? '<section class="pdf-section" id="pdf"><div class="pdf-toolbar"><span>PDF document' + (p.pages ? ' · ' + p.pages + (p.pages === 1 ? ' page' : ' pages') : '') + '</span><a href="' + p.pdfHref + '" target="_blank" rel="noopener">Open PDF</a><a href="' + p.pdfHref + '" download>Download</a></div><p class="pdf-hint">If the preview is unavailable, open or download the PDF to read it.</p><iframe class="pdf-viewer" src="' + link(p.route + 'pdf.html') + '"' + (p.encrypted ? ' data-pdf-source="' + e(p.pdfHref) + '"' : '') + ' title="' + e(p.title) + ' PDF" loading="lazy"></iframe></section>' : '';
     const rights = config.copyright ?? {};
-    const author = rights.author || footer.label.replace(/^@/, ''), authorUrl = rights.authorUrl || footer.url;
+    const author = rights.author || config.author || 'Your Name', authorUrl = rights.authorUrl || config.homepage || 'https://example.com';
     const permalink = (config.url || '') + p.href;
     const license = rights.licenseUrl ? '<a rel="license" href="' + e(rights.licenseUrl) + '">' + e(rights.license) + '</a>' : e(rights.license || '');
     const notice = rights.license ? 'Unless otherwise stated, this article is licensed under ' + license + '.' : 'All rights reserved.';
@@ -50,15 +52,14 @@ export function templates(config) {
     const count = new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(p.wordCount).toLowerCase();
     const words = '<span class="word-count" lang="en">' + count + (p.wordCount === 1 ? ' word' : ' words') + '</span>';
     const attachment = p.pdf && p.pages ? '<span class="attachment-pages" lang="en">Attachment: ' + p.pages + (p.pages === 1 ? ' page' : ' pages') + '</span>' : '';
-    const draftNotice = p.draft ? '<p class="draft-notice" lang="en">' + draftBadge(p) + '<span>Unpublished · local preview only</span></p>' : '';
-    const article = '<article class="note" lang="' + e(p.lang) + '"><header class="article-header">' + draftNotice + '<h1>' + e(p.title) + '</h1><div class="article-meta">' + encryptedBadge(p) + date(p.date) + words + attachment + (p.tags.length ? '<div class="tags article-tags header-tags" aria-label="Article tags">' + tags(p.tags) + '</div>' : '') + '</div></header>' + toc + '<div class="prose">' + rendered.html + '</div>' + pdf + end + '</article>';
+    const article = '<article class="note" lang="' + e(p.lang) + '"><header class="article-header">' + articleStatus(p) + '<h1>' + e(p.title) + '</h1><div class="article-meta">' + date(p.date) + words + attachment + (p.tags.length ? '<div class="tags article-tags header-tags" aria-label="Article tags">' + tags(p.tags) + '</div>' : '') + '</div></header>' + toc + '<div class="prose">' + rendered.html + '</div>' + pdf + end + '</article>';
     return fragment ? article : layout(p.title, '<div class="article-layout">' + article + navigation({ previous, next }) + '</div>', { current: 'Notes', route: p.route, css: rendered.css });
   }
   function lockedPost(p, envelope, neighbors) {
     const data = JSON.stringify(envelope).replaceAll('<', '\\u003c');
     return layout(p.title, '<div class="article-layout"><article class="encrypted-note"><header class="article-header">' +
-      (p.draft ? '<p class="draft-notice" lang="en">' + draftBadge(p) + '<span>Unpublished · local preview only</span></p>' : '') +
-      '<h1>' + e(p.title) + '</h1><div class="article-meta">' + encryptedBadge(p) + date(p.date) + '<div class="tags">' + tags(p.tags) + '</div></div></header>' +
+      articleStatus(p) +
+      '<h1>' + e(p.title) + '</h1><div class="article-meta">' + date(p.date) + '<div class="tags">' + tags(p.tags) + '</div></div></header>' +
       '<section class="unlock-panel" aria-labelledby="unlock-heading"><h2 id="unlock-heading">Encrypted article</h2><p>Enter the password to read this article.</p>' +
       '<form class="unlock-form"><label for="article-password">Password</label><div class="unlock-controls"><input id="article-password" type="password" autocomplete="current-password" required disabled aria-describedby="unlock-status"><button type="submit" disabled>Unlock</button></div><p id="unlock-status" role="alert"></p></form>' +
       '<noscript><p>Enable JavaScript to unlock this article.</p></noscript></section></article>' + navigation(neighbors) + '</div><script id="encrypted-article" type="application/json" data-context="' + e(p.href) + '">' + data + '</script>',

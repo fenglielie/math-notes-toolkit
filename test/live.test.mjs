@@ -37,7 +37,7 @@ test('dev includes drafts and their resources while subsequent publication exclu
     assert.equal(JSON.parse(output.get('search-index.json')).filter(note => note.draft).length, 2);
     const html = output.get('en/bbbbbbbbbbbb/index.html').toString();
     assert.match(html, /Draft text/);
-    assert.match(html, /class="draft-notice"[^>]*>.*Unpublished · local preview only/);
+    assert.match(html, /class="article-status draft-notice"[^>]*>.*Unpublished · local preview only/);
     assert.doesNotMatch(output.get('en/aaaaaaaaaaaa/index.html').toString(), /class="draft-notice"/);
     assert.match(output.get('en/aaaaaaaaaaaa/index.html').toString(), /class="draft-badge"/);
     assert.match(html, /href="\/sub\/en\/cccccccccccc\/"/);

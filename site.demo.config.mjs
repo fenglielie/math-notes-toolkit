@@ -14,8 +14,5 @@ export default {
     license: 'CC BY-NC-SA 4.0',
     licenseUrl: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
   },
-  footer: {
-    label: '@Your Name',
-    url: 'https://example.com'
-  }
+  footer: 'A quiet place for mathematical notes.'
 };

@@ -68,11 +68,11 @@ export default {
     license: 'CC BY-NC-SA 4.0',
     licenseUrl: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
   },
-  footer: { label: 'All notes', url: 'https://example.com' }
+  footer: 'A quiet place for mathematical notes.'
 };
 ```
 
-`contentDirs` defaults to `content` and accepts one path or a nonempty array. Relative paths resolve from the site; absolute content paths are supported. All configured directories must exist. Omit `icon` to use the bundled favicon. `pageSize` must be a positive integer. Set `base` to a deployment prefix such as `/notes/`; generated links include it. Set `url` to the public origin for canonical URLs, the sitemap, robots.txt, and CNAME.
+`contentDirs` defaults to `content` and accepts one path or a nonempty array. Relative paths resolve from the site; absolute content paths are supported. All configured directories must exist. Omit `icon` to use the bundled favicon. `pageSize` must be a positive integer. Set `base` to a deployment prefix such as `/notes/`; generated links include it. Set `url` to the public origin for canonical URLs, the sitemap, robots.txt, CNAME, and the footer's All notes link. In local preview, that link points to localhost. `footer` is optional plain text shown centered below the footer controls; it defaults to empty and takes no space when omitted.
 
 Framework CSS and JavaScript are bundled automatically. Files in the site's optional `assets/` directory are copied as public assets and can override built-in files with the same name. Prefer the `styles` array to append project-local CSS after the default styles. URLs inside custom CSS resolve from the generated stylesheet under `assets/`; use appropriate relative paths or deployment-aware URLs.
 

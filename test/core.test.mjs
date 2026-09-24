@@ -7,6 +7,27 @@ import { frontmatter, metadata, safePath, withSlug } from '../scripts/content.mj
 import { renderMarkdown } from '../scripts/markdown.mjs';
 import { search } from '../scripts/search.mjs';
 import { build, generate } from '../scripts/build.mjs';
+import { templates } from '../scripts/templates.mjs';
+
+test('footer text is optional, escaped, and separate from the All notes link', () => {
+  const config = { title: 'Test', base: '/sub/', url: 'https://example.com' };
+  const empty = templates(config).home([]);
+  assert.match(empty, /class="all-notes" href="https:\/\/example.com\/sub\/">All notes<\/a>/);
+  assert.doesNotMatch(empty, /class="footer-text"/);
+  const filled = templates({ ...config, footer: 'Notes & <proofs>' }).home([]);
+  assert.match(filled, /<p class="footer-text">Notes &amp; &lt;proofs&gt;<\/p>/);
+});
+
+test('draft and encrypted badges share their positions when both apply', () => {
+  const t = templates({ title: 'Test', base: '/' });
+  const note = { title: 'Private draft', href: '/en/private/', route: 'en/private/', lang: 'en', tags: [], date: '', wordCount: 2, draft: true, encrypted: true };
+  const badges = /<span class="draft-badge"[^>]*>Draft<\/span><span class="encrypted-badge"[^>]*>Encrypted<\/span>/;
+  assert.match(t.home([note]), new RegExp(badges.source + '</span></a>'));
+  const article = t.post(note, { toc: [], html: '<p>Body</p>', css: '' });
+  assert.match(article, new RegExp('class="article-status draft-notice" lang="en">' + badges.source));
+  assert.equal((article.match(/class="draft-badge"/g) || []).length, 1);
+  assert.match(t.lockedPost(note, { data: 'test' }), new RegExp('class="article-status draft-notice" lang="en">' + badges.source));
+});
 
 test('YAML, UTF-8 and metadata validation', () => {
   const parsed = frontmatter('\uFEFF---\r\ntitle: 中英 Notes\r\ntags: [分析, Analysis]\r\n---\r\nText');

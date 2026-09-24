@@ -5,5 +5,5 @@ export default {
   url: 'https://example.com',
   pageSize: 10,
   copyright: { author: 'Your Name' },
-  footer: { label: 'All notes', url: 'https://example.com' }
+  footer: ''
 };

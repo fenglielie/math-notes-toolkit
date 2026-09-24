@@ -47,7 +47,10 @@ test('preview backs off occupied ports and serves base paths, redirects, HEAD, P
     assert.equal(response.headers.get('location'), '/sub/en/abcdef012345/?x=1');
     response = await fetch(origin + '/sub/en/abcdef012345/');
     assert.equal(response.status, 200);
-    assert.match(await response.text(), /__version/);
+    const previewPage = await response.text();
+    assert.match(previewPage, /__version/);
+    assert.match(previewPage, new RegExp('class="all-notes" href="http://localhost:' + new URL(origin).port + '/sub/"'));
+    assert.doesNotMatch(previewPage, /class="footer-text"/);
     response = await fetch(origin + '/sub/sitemap.xml');
     assert.equal(response.status, 200);
     assert.equal(response.headers.get('content-type'), 'application/xml; charset=utf-8');

@@ -36,7 +36,9 @@ const server = http.createServer(async (req, res) => {
     let body = output.get(file);
     const ext = path.extname(file);
     if (ext === '.html') {
-      body = Buffer.from(body.toString().replace('</body>', reloadScript(version) + '</body>'));
+      body = Buffer.from(body.toString()
+        .replace(/(<a class="all-notes" href=")[^"]*(")/, (_, start, end) => start + 'http://localhost:' + port + config.base + end)
+        .replace('</body>', reloadScript(version) + '</body>'));
     }
     const headers = { 'Content-Type': types[ext] || 'application/octet-stream', 'Cache-Control': 'no-cache', 'X-Content-Type-Options': 'nosniff' };
     // Native PDF viewers use byte-range requests for large documents.
