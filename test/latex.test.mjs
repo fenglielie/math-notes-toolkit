@@ -41,14 +41,14 @@ test('LaTeX-enabled build compiles missing and existing PDFs once per source bef
   await write('content/draft.tex', 'Do not compile');
   const calls = [];
   t.mock.method(childProcess, 'execFile', (command, args, options, callback) => {
-    calls.push(args.at(-1));
+    const source = path.resolve(options.cwd, args.at(-1));
+    calls.push(source);
     assert.equal(command, 'latexmk');
-    assert.equal(options.cwd, path.dirname(path.resolve(args.at(-1))));
+    assert.equal(options.cwd, path.dirname(source));
     assert.equal(options.windowsHide, true);
-    assert.equal(options.env.SOURCE_DATE_EPOCH, '946684800');
-    assert.equal(options.env.FORCE_SOURCE_DATE, '0');
+    assert.equal(options.env, undefined);
     assert.ok(!options.shell);
-    fs.writeFile(args.at(-1).replace(/\.tex$/, '.pdf'), samplePdf({ text: 'Fresh lecture' }))
+    fs.writeFile(source.replace(/\.tex$/, '.pdf'), samplePdf({ text: 'Fresh lecture' }))
       .then(() => callback(null, '', ''), callback);
   });
   const result = await build({ root, latex: true });
@@ -110,15 +110,13 @@ test('direct latexmk invocation selects supported engines and preserves paths as
   const { root, write } = await fixture(t);
   const directory = path.join(root, 'content', '中文 & space');
   const source = path.join(directory, '-lecture.tex'), pdf = path.join(directory, '-lecture.pdf');
-  const portable = file => file.split(path.sep).join('/');
   let lastArgs, calls = 0;
   t.mock.method(childProcess, 'execFile', (command, args, options, callback) => {
     assert.equal(command, 'latexmk');
     assert.equal(options.cwd, directory);
     assert.ok(!options.shell);
     assert.equal(options.windowsHide, true);
-    assert.equal(options.env.SOURCE_DATE_EPOCH, '946684800');
-    assert.equal(options.env.FORCE_SOURCE_DATE, '0');
+    assert.equal(options.env, undefined);
     lastArgs = args;
     calls++;
     fs.writeFile(pdf, samplePdf()).then(() => callback(null, '', ''), callback);
@@ -129,8 +127,8 @@ test('direct latexmk invocation selects supported engines and preserves paths as
   ]) {
     await write('content/中文 & space/-lecture.tex', header + '\\documentclass{article}\n\\begin{document}Test\\end{document}');
     await compileLatex(source, pdf);
-    assert.deepEqual(lastArgs, ['-cd', '-silent', '-file-line-error', '-halt-on-error', '-interaction=nonstopmode',
-      '-synctex=1', '-g', flag, '-auxdir=' + portable(path.join(directory, '.aux')), '-outdir=' + portable(directory), portable(source)]);
+    assert.deepEqual(lastArgs, ['-file-line-error', '-halt-on-error', '-interaction=nonstopmode',
+      '-synctex=1', flag, '-auxdir=.aux', '-outdir=.', './-lecture.tex']);
     assert.ok((await fs.stat(path.join(directory, '.aux'))).isDirectory());
   }
   await write('content/中文 & space/-lecture.tex', '% !TEX program = pdflatex -shell-escape\n');
@@ -211,6 +209,8 @@ test('preview reuses successful PDFs across calls and invalidates actual TeX, te
   assert.equal(calls, 1);
   for (const file of ['shared/setup.tex', 'content/chapter.tex', 'content/plot.png', 'shared/refs.bib', 'content/lecture.tex']) {
     await fs.appendFile(path.join(root, file), '\nUpdated');
+    // Let filesystem mtimes settle before the compiler start time is recorded.
+    await new Promise(resolve => setTimeout(resolve, 20));
     const before = calls;
     await compileLatex(source, pdf, { reuse: true });
     assert.equal(calls, before + 1, file + ' must invalidate the cache');
@@ -222,13 +222,13 @@ test('preview reuses successful PDFs across calls and invalidates actual TeX, te
   assert.equal(calls, 7);
   await compileLatex(source, pdf);
   assert.equal(calls, 8, 'Explicit LaTeX builds always invoke latexmk');
-  assert.deepEqual(forced, [true, false, false, false, false, false, false, false],
-    'Only adoption of the PDF policy forces typesetting; later calls remain incremental');
+  assert.deepEqual(forced, [false, false, false, false, false, false, false, false],
+    'Ordinary compilation leaves rebuild decisions to latexmk');
   const legacy = JSON.parse(await fs.readFile(cache, 'utf8'));
-  legacy.version = 2;
+  legacy.version = 3;
   await fs.writeFile(cache, JSON.stringify(legacy));
   await compileLatex(source, pdf, { reuse: true });
-  assert.equal(calls, 9, 'Unchanged PDFs from the old policy must be rebuilt');
+  assert.equal(calls, 9, 'PDFs from the fixed-date policy must be rebuilt');
   assert.equal(forced.at(-1), true);
   await compileLatex(source, pdf, { reuse: true });
   assert.equal(calls, 9, 'The rebuilt PDF becomes reusable');

@@ -130,7 +130,7 @@ pdf: lecture.pdf
 ---
 ```
 
-The PDF path is relative to the wrapper. Ordinary builds require an existing PDF and never invoke LaTeX. `build:latex` compiles PDFs with same-name `.tex` sources through `latexmk`; development previews also compile them and reuse successful outputs only while recorded dependencies remain unchanged. Compilation failures fail the build even if an older PDF exists.
+The PDF path is relative to the wrapper. Ordinary builds require an existing PDF and never invoke LaTeX. `build:latex` runs `latexmk` for PDFs with same-name `.tex` sources; development previews reuse successful outputs while recorded dependencies remain unchanged. Compilation failures fail the build even if an older PDF exists.
 
 Keep generated PDFs beside their sources and auxiliary files under a sibling `.aux/` directory. Generated PDFs do not need to be tracked by Git when CI runs `build:latex` before deployment; ignore only generated PDFs, keeping PDF-only attachments available to the build. If the deployment environment only runs an ordinary build, supply prebuilt PDFs by committing them or downloading them before building. Select an engine with a first-line `% !TEX program = pdflatex`, `xelatex`, or `lualatex` directive; otherwise the framework defaults to XeLaTeX. Use XeLaTeX for Chinese or mixed CJK documents.
 

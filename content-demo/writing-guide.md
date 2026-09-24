@@ -957,7 +957,7 @@ Commit the PDF beside its LaTeX source, together with the source and its inputs.
 
 Try the [PDF example with metadata and a two-page document](numerical-analysis/trapezoidal-rule.md). The PDF contains selectable text, numbered equations, a theorem, a proof, and a table. PDF contents are not converted into Markdown; the Contents navigation comes from the wrapper's headings.
 
-Framework compilation sets `SOURCE_DATE_EPOCH=946684800` to fix automatic PDF timestamps at 2000-01-01 UTC and stabilize time-based document IDs and font tags. Adopting this policy forces one rebuild; subsequent builds remain incremental. Explicit dates in the document stay unchanged. Use an explicit document date instead of the default `\today`: `FORCE_SOURCE_DATE=0` preserves today's date in XeLaTeX and pdfLaTeX, while LuaLaTeX may still use the fixed time. Reproducibility requires unchanged sources, dependencies, paths, TeX and fonts; dynamic dates, unseeded randomness and external tools can still change the output. Default builds publish existing PDFs without modifying their metadata.
+Compilation runs `latexmk` from the source directory with `.aux/` for auxiliary files and the PDF beside the `.tex` file. `latexmk` decides whether an unchanged document needs typesetting. Ordinary builds publish existing PDFs without changing them.
 
 ## BibTeX citations
 

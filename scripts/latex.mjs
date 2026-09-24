@@ -3,8 +3,6 @@ import path from 'node:path';
 import childProcess from 'node:child_process';
 
 const engines = { xelatex: '-pdfxe', pdflatex: '-pdf', lualatex: '-pdflua' };
-// Fix compiler-generated PDF dates and time-based IDs; explicit document dates stay intact.
-const pdfEpoch = '946684800'; // 2000-01-01 UTC; independent of commits and file mtimes.
 
 async function engineFor(source) {
   const firstLine = (await fs.readFile(source, 'utf8')).replace(/^\uFEFF/, '').split(/\r?\n/, 1)[0];
@@ -47,7 +45,7 @@ export async function compileLatex(source, pdf, { reuse = false } = {}) {
   const cacheFile = path.join(path.dirname(source), '.aux', path.basename(source) + '.preview-cache.json');
   let previous;
   try { previous = JSON.parse(await fs.readFile(cacheFile, 'utf8')); } catch { /* No usable cache. */ }
-  const compatible = previous?.version === 3 && previous.engine === engine
+  const compatible = previous?.version === 4 && previous.engine === engine
     && previous.source === source && previous.pdf === pdf;
   if (reuse && compatible) {
     try {
@@ -61,16 +59,15 @@ export async function compileLatex(source, pdf, { reuse = false } = {}) {
   await fs.rm(cacheFile, { force: true });
   const directory = path.dirname(source), aux = path.join(directory, '.aux');
   await fs.mkdir(aux, { recursive: true });
-  const portable = file => file.split(path.sep).join('/');
-  // latexmk does not track environment changes: rebuild once when adopting this policy.
-  const args = ['-cd', '-silent', '-file-line-error', '-halt-on-error', '-interaction=nonstopmode',
-    '-synctex=1', ...(!compatible ? ['-g'] : []), engines[engine], '-auxdir=' + portable(aux), '-outdir=' + portable(directory), portable(source)];
+  // A PDF built under the former fixed-date policy needs one forced rebuild.
+  const args = ['-file-line-error', '-halt-on-error', '-interaction=nonstopmode',
+    '-synctex=1', ...(previous?.version === 3 ? ['-g'] : []), engines[engine],
+    '-auxdir=.aux', '-outdir=.', './' + path.basename(source)];
   const started = performance.timeOrigin + performance.now();
   console.log('Compiling LaTeX (' + engine + '): ' + source);
   await new Promise((resolve, reject) => {
     childProcess.execFile('latexmk', args, {
-      cwd: directory, windowsHide: true, timeout: 240_000, maxBuffer: 4 * 1024 * 1024,
-      env: { ...process.env, SOURCE_DATE_EPOCH: pdfEpoch, FORCE_SOURCE_DATE: '0' }
+      cwd: directory, windowsHide: true, timeout: 240_000, maxBuffer: 4 * 1024 * 1024
     }, (error, stdout, stderr) => {
       if (!error) return resolve();
       if (error.code === 'ENOENT') {
@@ -95,7 +92,7 @@ export async function compileLatex(source, pdf, { reuse = false } = {}) {
     const inputStamps = await stamps(inputs);
     // A source edited during compilation must be checked again on the next pass.
     if (inputStamps.some(entry => entry[2] > started)) return;
-    const cache = { version: 3, engine, source, pdf, stamps: [...inputStamps, ...await stamps([pdf, ...records])] };
+    const cache = { version: 4, engine, source, pdf, stamps: [...inputStamps, ...await stamps([pdf, ...records])] };
     await fs.writeFile(cacheFile, JSON.stringify(cache));
   } catch {
     // Dependency recording is an optimization; compilation remains authoritative.
